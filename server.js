@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to the Job Tracker API!');
 });
 
-app.use('/api/v1/auth', authRouter);
+app.use('/api/auth/v1', authRouter);
 app.use('/api/v1/jobs', authenticateUser, jobsRouter);
 
 
