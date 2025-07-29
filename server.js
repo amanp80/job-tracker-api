@@ -1,5 +1,3 @@
-// server.js
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -17,27 +15,29 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // --- CORS Configuration ---
-// IMPORTANT: This is the new section to allow your frontend to connect.
+// This is the critical new section.
 const allowedOrigins = [
-    'http://localhost:3000',
-    'https://job-tracker-frontend-lilac-two.vercel.app/',
- // Your local frontend for testing
-    // Add your deployed Vercel URL here. Example:
-    // 'https://job-tracker-frontend-xxxx.vercel.app' 
+    'http://localhost:3000', // For local testing
+    // Add your Vercel URL here. Example below.
+    'https://job-tracker-frontend-lilac-two.vercel.app' 
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
         }
+        return callback(null, true);
     },
+    credentials: true,
 };
 
-// --- Middleware ---
 app.use(cors(corsOptions)); // Use the new CORS options
+
+// --- Middleware ---
 app.use(express.json());
 
 // --- API Routes ---
