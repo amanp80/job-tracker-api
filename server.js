@@ -18,25 +18,25 @@ const PORT = process.env.PORT || 5001;
 // This is the critical new section.
 const allowedOrigins = [
     'http://localhost:3000', // For local testing
-    // Add your Vercel URL here. Example below.
-    'https://job-tracker-frontend-alpha.vercel.app' 
+    // Add your Vercel URL here. This has been updated with your latest URL.
+    'https://job-tracker-frontend-4dtrcgp8l-amans-projects-5b00666a.vercel.app' 
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-        return callback(null, true);
     },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Explicitly allow methods
     credentials: true,
 };
 
 // --- Middleware ---
-// This is the most important part: Use the CORS options.
+// This is the most important part: Use the new CORS options.
 app.use(cors(corsOptions));
 app.use(express.json());
 
