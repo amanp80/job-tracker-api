@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -19,7 +20,7 @@ const PORT = process.env.PORT || 5001;
 const allowedOrigins = [
     'http://localhost:3000', // For local testing
     // Add your Vercel URL here. Example below.
-    'https://job-tracker-frontend-lilac-two.vercel.app' 
+    'https://job-tracker-frontend-alpha.vercel.app' 
 ];
 
 const corsOptions = {
@@ -35,9 +36,9 @@ const corsOptions = {
     credentials: true,
 };
 
-app.use(cors(corsOptions)); // Use the new CORS options
-
 // --- Middleware ---
+// This is the most important part: Use the CORS options.
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // --- API Routes ---
