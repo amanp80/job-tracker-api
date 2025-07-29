@@ -14,30 +14,34 @@ const authenticateUser = require('./middleware/authentication');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// --- CORS Configuration ---
-// This is the critical new section.
-const allowedOrigins = [
-    'http://localhost:3000', // For local testing
-    // Add your Vercel URL here. This has been updated with your latest URL.
-    'https://job-tracker-frontend-4dtrcgp8l-amans-projects-5b00666a.vercel.app' 
-];
-
+// --- Definitive CORS Configuration ---
 const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    origin: (origin, callback) => {
+        // The 'origin' is the URL of the frontend making the request (e.g., your Vercel URL)
+
+        // Allow requests with no origin (like Postman or mobile apps)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        // Allow your local frontend and ANY Vercel deployment URL to connect
+        if (origin === 'http://localhost:3000' || new URL(origin).hostname.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Explicitly allow methods
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 };
 
 // --- Middleware ---
-// This is the most important part: Use the new CORS options.
+// IMPORTANT: Handle preflight requests across all routes before other middleware
+app.options('*', cors(corsOptions));
+
+// Use the CORS options for all other requests
 app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // --- API Routes ---
@@ -45,7 +49,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to the Job Tracker API!');
 });
 
-app.use('/api/auth/v1', authRouter);
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs', authenticateUser, jobsRouter);
 
 
@@ -54,7 +58,7 @@ const start = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Connected to MongoDB successfully!');
-        
+
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
